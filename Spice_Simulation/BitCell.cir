@@ -1,0 +1,51 @@
+BitCell
+
+.include .\gpdk90nm\gpdk90nm_tt.cir
+
+
+.param Vdd = 0.4
+.options temp=27 *room temperature
+
+
+.subckt SRLatch in1 in2 out1 Vdd Vss
+xNAND1 in1 node2 out1 Vdd Vss 2inNAND
+xNAND2 out1 in2 node2 Vdd Vss 2inNAND
+.ends
+
+.subckt BitCell data sel rw out1 tempOut Vdd Vss
+xNAND1 data sel rw node1 Vdd Vss 3inNAND
+xNAND2 node1 sel rw node2 Vdd Vss 3inNAND
+
+xSR1 node1 node2 tempOut Vdd Vss SRLatch
+
+xNOT1 rw node3 Vdd Vss 1inNOT
+xAND1 tempOut node3 sel out1 Vdd Vss 3inAND
+.ends
+
+
+V1 1 0 dc Vdd
+
+*Pulses to check functionality
+V_select sel 0 pulse(0 Vdd 5ns 0.1ns 0.1ns 2.9ns 15ns)
+V_data data 0 pulse(0 Vdd 20ns 0.1ns 0.1ns 10ns 50ns)
+V_rw rw 0 pulse(Vdd 0 25ns 0.1ns 0.1ns 23ns 50ns)
+
+*Pulses to check timing
+*V_select sel 0 pulse(0 Vdd 5ns 0.1ns 0.1ns 2.9ns 5ns)
+*V_data data 0 pulse(Vdd 0 4ns 0.1ns 0.1ns 4ns 10ns)
+*V_rw rw 0 pulse(0 Vdd 3ns 0.1ns 0.1ns 23ns 50ns)
+
+
+
+*Logic signals to check the circuit functionality/ timing
+xBitcell data sel rw Y tempY 1 0 BitCell
+.tran 10n 60n 20n
+.plot v(data) v(sel) v(tempY) v(rw) v(Y)
+
+
+
+
+
+*Logic to check leakage current
+*xBitcell2 0 0 0 Y1 tempY1 1 0 BitCell
+*.op xBitcell2

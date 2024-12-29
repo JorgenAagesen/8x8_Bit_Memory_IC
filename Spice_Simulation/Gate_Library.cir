@@ -1,0 +1,70 @@
+*Gate Library
+
+.include C:\Users\jorge\Desktop\AimSPICE\gpdk90nm_tt.cir
+
+.param Length = 100n
+
+*Width ratios for static CMOS to achieve highest efficiency
+.param Width_NMOS_NAND2 = 200n
+.param Width_NMOS_NAND3 = 300n
+.param Width_NMOS_NOT = 200n
+
+.param Width_PMOS_NAND2 = 200n
+.param Width_PMOS_NAND3 = 200n
+.param Width_PMOS_NOT = 400n
+
+
+
+*NOT--------------------------------
+
+.subckt 1inNOT in1 out1 Vdd Vss
+xmp1 Vdd in1 out1 Vdd pmos1v L=Length W=Width_PMOS_NOT
+xmn2 out1 in1 vss Vss nmos1v L=Length W=Width_NMOS_NOT
+.ends
+
+*NAND--------------------------------
+
+.subckt 2inNAND in1 in2 out1 Vdd Vss
+xmp1 Vdd in1 out1 Vdd pmos1v L=Length W=Width_PMOS_NAND2
+xmp2 Vdd in2 out1 Vdd pmos1v L=Length W=Width_PMOS_NAND2
+
+xmn1 out1 in1 node1 Vss nmos1v L=Length W=Width_NMOS_NAND2
+xmn2 node1 in2 vss Vss nmos1v L=Length W=Width_NMOS_NAND2
+.ends
+
+.subckt 3inNAND in1 in2 in3 out1 Vdd Vss
+xmp1 Vdd in1 out1 Vdd pmos1v L=Length W=Width_PMOS_NAND3
+xmp2 Vdd in2 out1 Vdd pmos1v L=Length W=Width_PMOS_NAND3
+xmp3 Vdd in3 out1 Vdd pmos1v L=Length W=Width_PMOS_NAND3
+
+xmn1 out1 in1 node1 Vss nmos1v L=Length W=Width_NMOS_NAND3
+xmn2 node1 in2 node2 Vss nmos1v L=Length W=Width_NMOS_NAND3
+xmn3 node2 in3 vss Vss nmos1v L=Length W=Width_NMOS_NAND3
+.ends
+
+
+*AND--------------------------------
+.subckt 2inAND in1 in2 out1 Vdd Vss
+xmp1 Vdd in1 node1 Vdd pmos1v L=Length W=Width_PMOS_NAND2
+xmp2 Vdd in2 node1 Vdd pmos1v L=Length W=Width_PMOS_NAND2
+
+xmn1 node1 in1 node2 Vss nmos1v L=Length W=Width_NMOS_NAND2
+xmn2 node2 in2 vss Vss nmos1v L=Length W=Width_NMOS_NAND2
+
+xmp3 Vdd node1 out1 Vdd pmos1v L=Length W=Width_PMOS_NOT
+xmn3 out1 node1 Vss Vss nmos1v L=Length W=Width_NMOS_NOT
+.ends
+
+.subckt 3inAND in1 in2 in3 out1 Vdd Vss
+xmp1 Vdd in1 node1 Vdd pmos1v L=Length W=Width_PMOS_NAND3
+xmp2 Vdd in2 node1 Vdd pmos1v L=Length W=Width_PMOS_NAND3
+xmp3 Vdd in3 node1 Vdd pmos1v L=Length W=Width_PMOS_NAND3
+
+xmn1 node1 in1 node2 Vss nmos1v L=Length W=Width_NMOS_NAND3
+xmn2 node2 in2 node3 Vss nmos1v L=Length W=Width_NMOS_NAND3
+xmn3 node3 in3 vss Vss nmos1v L=Length W=Width_NMOS_NAND3
+
+xmp4 Vdd node1 out1 Vdd pmos1v L=Length W=Width_PMOS_NOT
+xmn4 out1 node1 Vss Vss nmos1v L=Length W=Width_NMOS_NOT
+.ends
+
